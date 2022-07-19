@@ -1,0 +1,9 @@
+Xerxes' terminal, version 1.0.0 -release (x86_64-pc-linux-gnu)
+Usage: terminal [option]
+options:
+    -h:show help
+    -c:clean history records
+    -n:running normally
+more options will supported in the later version.
+You can reports bug(s) to e-mail noip2018rp@gamil.com
+--Xerxes, 7/9/2022
