@@ -1,6 +1,6 @@
 # XERXES' Terminal
 ### Source
-To get the source code, use(coming soon)
+To get the source code, use
 
 ```bash
 $ git clone https://github.com/Xerxesqwq/terminal
