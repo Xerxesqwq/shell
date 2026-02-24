@@ -47,7 +47,8 @@ char* getprompt() {
             if(flag == 0) {
                 memset(prompt.cmd, 0, sizeof(prompt.cmd));
                 buf[pos] = 0;
-                memcpy(prompt.cmd, buf, sizeof(buf));
+                memcpy(prompt.cmd, buf, sizeof(prompt.cmd) - 1);
+                prompt.cmd[sizeof(prompt.cmd) - 1] = '\0';
                 //printf("%d\n", prompt.cmd);
                 trieFind(&prompt);
                 tipPos = 0;
@@ -72,7 +73,10 @@ char* getprompt() {
             printf("\b%c\b", ' ');
             pos--;
         } else {
-            buf[pos] = ch; pos++;
+            if(pos < (int)sizeof(buf) - 1) {
+                buf[pos] = ch;
+                pos++;
+            }
             
             if(pos >= 3) lst = buf[pos - 3] * 1000000 + buf[pos - 2] * 1000 + buf[pos - 1];
             putchar(ch);
@@ -159,12 +163,13 @@ void SIGINT_PROCESS(int t) {
 int ___st;
 void SIGSTP_PROCESS() {
     if(frontpid == 0) return;
-    kill(frontpid, SIGSTOP);
-    printf("\b\bxerxes-terminal: suspended %d\n", frontpid);
-    suspendpid = frontpid;
+    int stopped_pid = frontpid;
+    kill(stopped_pid, SIGSTOP);
+    printf("\b\bxerxes-terminal: suspended %d\n", stopped_pid);
+    suspendpid = stopped_pid;
     frontpid = 0;
     //memcpy(__suspend, ans, strlen(ans) + 1);
-    waitpid(frontpid, &___st, WNOHANG);
+    waitpid(stopped_pid, &___st, WNOHANG);
 }
 
 char** __cmd;
@@ -377,7 +382,8 @@ int main(int argc, char *args[]) {
 
         if(strcmp(hiscmd[hisptr], ans) != 0) {
             hisptr++;
-            memcpy(hiscmd[hisptr], ans, strlen(ans));
+            strncpy(hiscmd[hisptr], ans, sizeof(hiscmd[hisptr]) - 1);
+            hiscmd[hisptr][sizeof(hiscmd[hisptr]) - 1] = '\0';
         }
         trieInsert(ans);
         
