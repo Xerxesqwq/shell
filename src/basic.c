@@ -3,9 +3,23 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <pwd.h>
+#include <sys/types.h>
 
 void getUserName(char *s) {
-    cuserid(s);
+    const char *user = getenv("USER");
+    if(user && user[0] != '\0') {
+        strncpy(s, user, 31);
+        s[31] = '\0';
+        return;
+    }
+    struct passwd *pw = getpwuid(getuid());
+    if(pw && pw->pw_name) {
+        strncpy(s, pw->pw_name, 31);
+        s[31] = '\0';
+        return;
+    }
+    strcpy(s, "unknown");
 }
 
 void getHostName(char *s) {
@@ -46,7 +60,8 @@ static char* getdic(const char *s) {
 
 void printInfo() {
     char username[32], hostname[32];
-    char pwd[1024]; getcwd(pwd, 1024);
+    char pwd[1024];
+    if(!getcwd(pwd, sizeof(pwd))) strcpy(pwd, "?");
     getUserName(username);
     getHostName(hostname);
     char *dic = getdic(pwd);
@@ -79,7 +94,8 @@ int main(int argc, char *argv[]) {
     char username[32], hostname[32];
     chdir("./testdir");
 
-    char pwd[1024]; getcwd(pwd, 1024);
+    char pwd[1024];
+    if(!getcwd(pwd, sizeof(pwd))) strcpy(pwd, "?");
     getUserName(username);
     getHostName(hostname);
     while(1) {
